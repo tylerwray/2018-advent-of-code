@@ -1,15 +1,25 @@
 defmodule AdventOfCode.Day1 do
-  defp combine(x, acc) do
-    operator = String.at(x, 0)
+  def sum do
+    get_frequency_changes()
+    |> Enum.reduce(0, &combine/2)
+  end
+
+  def first_duplicate do
+    changes = get_frequency_changes()
+    hunt_duplicate(:cont, changes, 0, %{}, 0)
+  end
+
+  defp combine(operation, sum) do
+    operator = String.at(operation, 0)
 
     number =
-      x
+      operation
       |> String.slice(1..-1)
       |> String.to_integer()
 
     case operator do
-      "+" -> acc + number
-      "-" -> acc - number
+      "+" -> sum + number
+      "-" -> sum - number
     end
   end
 
@@ -20,26 +30,28 @@ defmodule AdventOfCode.Day1 do
     |> String.split("\n")
   end
 
-  def sum do
-    get_frequency_changes()
-    |> Enum.reduce(0, &combine/2)
+  defp hunt_duplicate(:halt, frequency) do
+    frequency
   end
 
-  defp hunt_duplicate(x, {map, sum}) do
-    frequency = combine(x, sum)
+  defp hunt_duplicate(:cont, changes, cursor, map, sum) do
+    currentCursor =
+      case length(changes) == cursor do
+        true -> 0
+        false -> cursor
+      end
+
+    operation = Enum.at(changes, currentCursor)
+    frequency = combine(operation, sum)
 
     exists = Map.has_key?(map, frequency)
 
     case exists do
-      false -> {:cont, {Map.put(map, frequency, 1), frequency}}
-      true -> {:halt, {map, frequency}}
-    end
-  end
+      false ->
+        hunt_duplicate(:cont, changes, currentCursor + 1, Map.put(map, frequency, 1), frequency)
 
-  def first_duplicate do
-    # TODO: Figure out how to continually go through the list of frequency changes
-    # Recursion?
-    get_frequency_changes()
-    |> Enum.reduce_while({%{}, 0}, &hunt_duplicate/2)
+      true ->
+        hunt_duplicate(:halt, frequency)
+    end
   end
 end
