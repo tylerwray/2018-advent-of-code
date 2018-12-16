@@ -24,7 +24,7 @@ defmodule AdventOfCode.Day1 do
   end
 
   defp get_frequency_changes do
-    "lib/day_1.txt"
+    "lib/day_1/frequency_changes.txt"
     |> Path.absname()
     |> File.read!()
     |> String.split("\n")
