@@ -44,9 +44,7 @@ defmodule AdventOfCode.Day1 do
     operation = Enum.at(changes, currentCursor)
     frequency = combine(operation, sum)
 
-    exists = Map.has_key?(map, frequency)
-
-    case exists do
+    case Map.has_key?(map, frequency) do
       false ->
         hunt_duplicate(:cont, changes, currentCursor + 1, Map.put(map, frequency, 1), frequency)
 
